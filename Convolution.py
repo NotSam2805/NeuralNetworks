@@ -52,11 +52,21 @@ def vertical_edge_kernel(width, height):
             kernel[i,j] = value
     return kernel
 
+def horizontal_edge_kernel(width,height):
+    kernel = np.zeros((width, height))
+    mid = int(height/2)
+    for i in range(height):
+        for j in range(width):
+            value = (i/mid) - 1
+            value = value / width
+            kernel[i,j] = value
+    return kernel
+
 X, y = mnist.test_data()
 image = X[0]
 
 show_image(image)
 
-k = vertical_edge_kernel(5,5)
+k = horizontal_edge_kernel(3,3)
 convolved = convolve_image(image, k)
 show_image(convolved)
