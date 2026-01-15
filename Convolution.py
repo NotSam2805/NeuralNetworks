@@ -7,6 +7,11 @@ def denormalise_image(image, factor = 255.0):
     size = math.sqrt(image.size)
     return image.reshape((size,size))
 
+def normalise_image(image, factor = 255.0):
+    size = image.shape[0] * image.shape[1]
+    image = image.reshape((size))
+    return np.divide(image, factor)
+
 def show_image(image, normalised=False):
     pyplot.clf()
     if normalised:
@@ -36,32 +41,34 @@ def convolve_image(image, kernel, normalised=False):
             else:
                 output[i,j] = np.sum(np.multiply(selection, kernel))
     
+    if (normalised):
+        return normalise_image(output)
+
     return output
 
-def pool_image(image, kernel, normalised = False):
+def max_pool_image(image, pooled_size, normalised = False):
     if(normalised):
-        #image = np.multiply(image, 255.0)
-        image = image.reshape((28,28))
-    image_height, image_width = image.shape
-    kernel_height, kernel_width = kernel.shape
-    output_height, output_width = int(image_height/kernel_height), int(image_width/kernel_width)
-    output = np.zeros((output_width,output_height))
-
-    for i in range(0,output_height):
-        min_height = i * kernel_height
-        max_height = min_height + kernel_height
-        for j in range(0,output_width):
-            min_width = j * kernel_width
-            max_width = min_width + kernel_width
-            selection = image[min_height:max_height, min_width:max_width]
-
-            if selection.shape != kernel.shape:
-                k = kernel[0:selection.shape[0], 0:selection.shape[1]]
-                output[i,j] = np.sum(np.multiply(selection, k))
-            else:
-                output[i,j] = np.sum(np.multiply(selection, kernel))
+        image = denormalise_image(image)
     
+    output_width, output_height = pooled_size
+    output = np.zeros(pooled_size)
+    factor_x = int(image.shape[0] / output_width)
+    factor_y = int(image.shape[1] / output_height)
+
+    for i in range(output_width):
+        min_x = i * factor_x
+        max_x = min_x + factor_x
+        for j in range(output_height):
+            min_y = j * factor_y
+            max_y = min_y + factor_y
+            selection = image[min_x:max_x, min_y:max_y]
+            output[i,j] = np.max(selection)
+    
+    if (normalised):
+        return normalise_image(output)
+
     return output
+
 
 def uniform_kernel(width, height):
     n = width * height
@@ -112,7 +119,7 @@ sharpen_kernel = np.array([[0.00,0.00,-0.5,0.00,0.00],
                            [0.00,0.00,-0.5,0.00,0.00]])
 
 X, y = mnist.test_data()
-image = X[0]
+image = X[1]
 show_image(image)
 
 sharpened = convolve_image(image,sharpen_kernel)
@@ -122,6 +129,5 @@ k = vertical_edge_kernel(3,3)
 convolved = convolve_image(sharpened, k)
 show_image(convolved)
 
-k = uniform_kernel(2,2)
-pooled = pool_image(convolved, k)
+pooled = max_pool_image(convolved, (14,14))
 show_image(pooled)
