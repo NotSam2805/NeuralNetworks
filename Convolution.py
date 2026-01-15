@@ -2,6 +2,12 @@ import numpy as np
 from matplotlib import pyplot
 import math
 
+sharpen_kernel = np.array([[0.00,0.00,-0.5,0.00,0.00],
+                           [0.00,-0.5,-0.5,-0.5,0.00],
+                           [-0.5,-0.5,6.00,-0.5,-0.5],
+                           [0.00,-0.5,-0.5,-0.5,0.00],
+                           [0.00,0.00,-0.5,0.00,0.00]])
+
 def denormalise_image(image, factor = 255.0):
     image = np.multiply(image, factor)
     size = math.sqrt(image.size)
@@ -114,27 +120,22 @@ def average_image(images):
     np.divide(output, count)
     return output
 
-import mnist_data as mnist
+def test():
+    import mnist_data as mnist
 
-sharpen_kernel = np.array([[0.00,0.00,-0.5,0.00,0.00],
-                           [0.00,-0.5,-0.5,-0.5,0.00],
-                           [-0.5,-0.5,6.00,-0.5,-0.5],
-                           [0.00,-0.5,-0.5,-0.5,0.00],
-                           [0.00,0.00,-0.5,0.00,0.00]])
+    X, y = mnist.test_data()
+    image = X[0]
+    show_image(image)
 
-X, y = mnist.test_data()
-image = X[0]
-show_image(image)
+    sharpened = convolve_image(image,sharpen_kernel)
+    show_image(sharpened)
 
-sharpened = convolve_image(image,sharpen_kernel)
-show_image(sharpened)
+    k = vertical_edge_kernel(3,3)
+    vert_edges = convolve_image(sharpened, k)
+    show_image(vert_edges)
 
-k = vertical_edge_kernel(3,3)
-vert_edges = convolve_image(sharpened, k)
-show_image(vert_edges)
+    k = horizontal_edge_kernel(3,3)
+    hori_edges = convolve_image(sharpened, k)
 
-k = horizontal_edge_kernel(3,3)
-hori_edges = convolve_image(sharpened, k)
-
-pooled = max_pool_image(vert_edges, (14,14))
-show_image(pooled)
+    pooled = max_pool_image(vert_edges, (14,14))
+    show_image(pooled)
