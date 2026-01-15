@@ -1,14 +1,5 @@
 import networks as n
 
-# SOTF_1,SGD_1.txt and SGD_2.txt are networks of [16,16] layers
-# SGD_3.txt is [64,64,32,32]
-# SGD_4.txt is [128,64,32]
-#
-# For ideal MNIST structure (as in 'ReLu_Softmax_test1.txt'),
-# use n.N_Network([128,64,32], 28 * 28, 10, [n.relu, n.relu, n.relu, n.softmax], [n.relu_prime, n.relu_prime, n.relu_prime])
-# note that the lists of functions (and the derivatives) is important, the other parameters matter less
-# 
-# for 'ReLu_Softmax_best_1.txt' use n.N_Network([128,64], 28 * 28, 10, [n.relu, n.relu, n.softmax], [n.relu_prime, n.relu_prime])
 dataset_size = 60000 #MAX=60000
 file = 'ReLu_Softmax_3.json'
 epochs = 10
