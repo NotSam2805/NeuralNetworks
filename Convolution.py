@@ -1,14 +1,16 @@
 import numpy as np
 from matplotlib import pyplot
-import mnist_data as mnist
+import math
+
+def denormalise_image(image, factor = 255.0):
+    image = np.multiply(image, factor)
+    size = math.sqrt(image.size)
+    return image.reshape((size,size))
 
 def show_image(image, normalised=False):
     pyplot.clf()
     if normalised:
-        image = np.multiply(image, 255.0)
-        image = image.reshape((28,28))
-    if np.max(image) <= 1.0:
-        image = np.multiply(image, 255.0)
+        image = denormalise_image(image)
     if np.min(image) < 0.0:
         image = np.multiply(image, 0.5)
         image = np.add(image, 255.0/2.0)
@@ -18,8 +20,7 @@ def show_image(image, normalised=False):
 
 def convolve_image(image, kernel, normalised=False):
     if(normalised):
-        #image = np.multiply(image, 255.0)
-        image = image.reshape((28,28))
+        image = denormalise_image(image)
     image_height, image_width = image.shape
     kernel_height, kernel_width = kernel.shape
     output = np.zeros(image.shape)
@@ -87,12 +88,38 @@ def horizontal_edge_kernel(width,height):
             kernel[i,j] = value
     return kernel
 
+def average_image(images):
+    output = np.zeros(images[0].shape)
+    height = output.shape[1]
+    width = output.shape[0]
+
+    count = 0.0
+    for image in images:
+        count += 1.0
+        for i in range(width):
+            for j in range(height):
+                output[i,j] += image[i,j]
+    
+    np.divide(output, count)
+    return output
+
+import mnist_data as mnist
+
+sharpen_kernel = np.array([[0.00,0.00,-0.5,0.00,0.00],
+                           [0.00,-0.5,-0.5,-0.5,0.00],
+                           [-0.5,-0.5,6.00,-0.5,-0.5],
+                           [0.00,-0.5,-0.5,-0.5,0.00],
+                           [0.00,0.00,-0.5,0.00,0.00]])
+
 X, y = mnist.test_data()
 image = X[0]
 show_image(image)
 
+sharpened = convolve_image(image,sharpen_kernel)
+show_image(sharpened)
+
 k = vertical_edge_kernel(3,3)
-convolved = convolve_image(image, k)
+convolved = convolve_image(sharpened, k)
 show_image(convolved)
 
 k = uniform_kernel(2,2)
