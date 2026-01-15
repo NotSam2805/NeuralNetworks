@@ -32,7 +32,7 @@ def convolve_image(image, kernel, normalised=False):
     
     return output
 
-def kernel(width, height):
+def uniform_kernel(width, height):
     n = width * height
     value = 1.0 / n
     return np.full((height, width), value)
@@ -42,6 +42,6 @@ image = X[0]
 
 show_image(image)
 
-k = kernel(3,3)
+k = uniform_kernel(3,3)
 convolved = convolve_image(image, k)
 show_image(convolved)
