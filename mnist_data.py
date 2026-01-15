@@ -45,13 +45,13 @@ def normalise_data(dataset):
 def normalised_training_data():
     print('Normalising training data...', end='\r')
     X = normalise_data(train_X)
-    print('Data normalised          ')
+    print('Data normalised              ')
     return (X, train_y)
 
 def normalised_test_data():
     print('Normalising test data...', end='\r')
     X = normalise_data(test_X)
-    print('Data normalised          ')
+    print('Data normalised              ')
     return (X, test_y)
 
 def label_to_output_layer(label):
