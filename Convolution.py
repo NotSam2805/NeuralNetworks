@@ -7,13 +7,18 @@ def show_image(image, normalised=False):
     if normalised:
         image = np.multiply(image, 255.0)
         image = image.reshape((28,28))
+    if np.max(image) <= 1.0:
+        image = np.multiply(image, 255.0)
+    if np.min(image) < 0.0:
+        image = np.multiply(image, 0.5)
+        image = np.add(image, 255.0/2.0)
     pyplot.imshow(image, cmap=pyplot.get_cmap('gray'))
     pyplot.autoscale()
     pyplot.show()
 
 def convolve_image(image, kernel, normalised=False):
     if(normalised):
-        image = np.multiply(image, 255.0)
+        #image = np.multiply(image, 255.0)
         image = image.reshape((28,28))
     image_height, image_width = image.shape
     kernel_height, kernel_width = kernel.shape
@@ -37,11 +42,21 @@ def uniform_kernel(width, height):
     value = 1.0 / n
     return np.full((height, width), value)
 
+def vertical_edge_kernel(width, height):
+    kernel = np.zeros((width, height))
+    mid = int(width/2)
+    for i in range(height):
+        for j in range(width):
+            value = (j/mid) - 1
+            value = value / height
+            kernel[i,j] = value
+    return kernel
+
 X, y = mnist.test_data()
 image = X[0]
 
 show_image(image)
 
-k = uniform_kernel(3,3)
+k = vertical_edge_kernel(5,5)
 convolved = convolve_image(image, k)
 show_image(convolved)
