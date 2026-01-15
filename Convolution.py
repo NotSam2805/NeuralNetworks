@@ -37,6 +37,31 @@ def convolve_image(image, kernel, normalised=False):
     
     return output
 
+def pool_image(image, kernel, normalised = False):
+    if(normalised):
+        #image = np.multiply(image, 255.0)
+        image = image.reshape((28,28))
+    image_height, image_width = image.shape
+    kernel_height, kernel_width = kernel.shape
+    output_height, output_width = int(image_height/kernel_height), int(image_width/kernel_width)
+    output = np.zeros((output_width,output_height))
+
+    for i in range(0,output_height):
+        min_height = i * kernel_height
+        max_height = min_height + kernel_height
+        for j in range(0,output_width):
+            min_width = j * kernel_width
+            max_width = min_width + kernel_width
+            selection = image[min_height:max_height, min_width:max_width]
+
+            if selection.shape != kernel.shape:
+                k = kernel[0:selection.shape[0], 0:selection.shape[1]]
+                output[i,j] = np.sum(np.multiply(selection, k))
+            else:
+                output[i,j] = np.sum(np.multiply(selection, kernel))
+    
+    return output
+
 def uniform_kernel(width, height):
     n = width * height
     value = 1.0 / n
@@ -64,9 +89,12 @@ def horizontal_edge_kernel(width,height):
 
 X, y = mnist.test_data()
 image = X[0]
-
 show_image(image)
 
-k = horizontal_edge_kernel(3,3)
+k = vertical_edge_kernel(3,3)
 convolved = convolve_image(image, k)
 show_image(convolved)
+
+k = uniform_kernel(2,2)
+pooled = pool_image(convolved, k)
+show_image(pooled)
