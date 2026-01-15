@@ -41,11 +41,9 @@ network = n.N_Network([16,16], 28 * 28, 10)
 
 import mnist_data as mnist
 
-print('Normalising test data...')
 (test_data, test_labels) = mnist.normalised_test_data()
-print('Normalising training data...')
 (train_data, train_labels) = mnist.normalised_training_data()
-print('Data normalised')
+
 
 print(f'Using dataset size: {dataset_size}')
 (dataset_X, dataset_y) = (train_data[:dataset_size], train_labels[:dataset_size])

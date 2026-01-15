@@ -121,9 +121,7 @@ print('Initialising network...', end='\r')
 network = n.N_Network([128,64], 28 * 28, 10, [n.relu, n.relu, n.softmax], [n.relu_prime, n.relu_prime])
 print('Network initialised              ')
 
-print('Normalising test data...', end='\r')
 (test_data, test_labels) = mnist.normalised_test_data()
-print('Data normalised          ')
 
 print(f'Using dataset size: {dataset_size}')
 (dataset_X, dataset_y) = (test_data[:dataset_size], test_labels[:dataset_size])

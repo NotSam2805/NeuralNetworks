@@ -16,11 +16,8 @@ import mnist_data as mnist
 
 (test_data, test_labels) = ([],[])
 if(eval):
-    print('Normalising test data...', end='\r')
     (test_data, test_labels) = mnist.normalised_test_data()
-print('Normalising training data...', end='\r')
 (train_data, train_labels) = mnist.normalised_training_data()
-print('Data normalised              ')
 
 print(f'Using dataset size: {dataset_size}')
 (dataset_X, dataset_y) = (train_data[:dataset_size], train_labels[:dataset_size])
