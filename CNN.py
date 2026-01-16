@@ -4,14 +4,19 @@ import networks as n
 
 class c_layer:
 
-    def __init__(self, size, activation = n.relu, kernels = []):
-        self.size = size
+    def __init__(self, layer_size, pool_size = (1,1), channels = 1, activation = n.relu, kernels = []):
+        self.size = layer_size
         self.activation = activation
-        self.biases = np.random.uniform(-1,1,(size[0]))
+        self.pool_size = pool_size
+        self.channels = channels
+        self.biases = np.random.uniform(-1,1,(layer_size[0]))
 
         if(kernels == []):
-            self.kernels = [c.random_kernel(size[1],size[2]) for i in range(size[0])]
-        elif(len(kernels) != size[0]):
+            if channels > 1:
+                self.kernels = [c.random_kernel((channels,layer_size[1],layer_size[2])) for i in range(layer_size[0])]
+            else:
+                self.kernels = [c.random_kernel((layer_size[1],layer_size[2])) for i in range(layer_size[0])]
+        elif(len(kernels) != layer_size[0]):
             raise Exception('kernel initialisation error')
         else:
             self.kernels = kernels
@@ -19,21 +24,37 @@ class c_layer:
     def feedforward(self, x):
         outputs = []
         for kernel, bias in zip(self.kernels, self.biases):
-            convolved = c.convolve_image(x, kernel)
-            outputs.append(self.activation(np.add(convolved,bias)))
+            if self.channels > 1:
+                convolved = [c.convolve_image(i,k) for i,k in zip(x,kernel)]
+                activated = self.activation(np.add(convolved, bias))
+                pooled = [c.max_pool_image(a, self.pool_size) for a in activated]
+            else:
+                convolved = c.convolve_image(x, kernel)
+                activated = self.activation(np.add(convolved, bias))
+                pooled = c.max_pool_image(activated, self.pool_size)
+            outputs.append(pooled)
         
         return np.array(outputs)
+        
 
 def test():
-    layer = c_layer((2,5,5), activation=n.relu)
+    layer1 = c_layer((2,5,5), (1,1), activation=n.relu)
+    layer2 = c_layer((4,3,3), channels=2, activation=n.sigmoid)
 
     import mnist_data as mnist
 
     X = mnist.test_X
 
-    out = layer.feedforward(X[0])
+    out = layer1.feedforward(X[0])
+    out = layer2.feedforward(out)
+    #print(out.shape)
 
     for image in out:
-        c.show_image(image)
+        if (len(image.shape) > 2):
+            for channel in image:
+                c.show_image(channel)
+        else:
+            c.show_image(image)
+
 
 test()

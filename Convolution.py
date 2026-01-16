@@ -90,10 +90,12 @@ def min_pool_image(image, pooling_size, stride = None, normalised = False):
 def average_pool_image(image, pooling_size, stride = None, normalised = False):
     return pool_image(image, pooling_size, np.average, stride, normalised)
 
-def uniform_kernel(width, height):
-    n = width * height
+def uniform_kernel(width, height, channels = 1):
+    n = width * height * channels
     value = 1.0 / n
-    return np.full((width, height), value)
+    if channels > 1:
+        return np.full((channels,width,height), value)
+    return np.full((width,height), value)
 
 def vertical_edge_kernel(width, height):
     kernel = np.zeros((width, height))
@@ -115,8 +117,8 @@ def horizontal_edge_kernel(width, height):
             kernel[i,j] = value
     return kernel
 
-def random_kernel(width, height):
-    return np.random.uniform(-1,1,(width,height))
+def random_kernel(size):
+    return np.random.uniform(-1,1,size)
 
 def average_image(images):
     output = np.zeros(images[0].shape)

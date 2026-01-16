@@ -4,7 +4,7 @@ import json
 import sys
 
 def sigmoid(x):
-  return 1 / (1 + np.exp(-x))
+  return np.divide(1,np.add(np.exp(-x),1))
 
 def sigmoid_prime(x):
     sig = sigmoid(x)
