@@ -56,21 +56,20 @@ def convolve_image(image, kernel, normalised=False):
 
     return output
 
-def max_pool_image(image, pooled_size, normalised = False):
+def max_pool_image(image, pooling_size, normalised = False):
     if(normalised):
         image = denormalise_image(image)
     
-    output_width, output_height = pooled_size
-    output = np.zeros(pooled_size)
-    factor_x = int(image.shape[0] / output_width)
-    factor_y = int(image.shape[1] / output_height)
+    output_width = int(image.shape[0] / pooling_size[0])
+    output_height = int(image.shape[1] / pooling_size[1])
+    output = np.zeros((output_width, output_height))
 
-    for i in range(output_height):
-        min_y = i * factor_y
-        max_y = min_y + factor_y
-        for j in range(output_width):
-            min_x = j * factor_x
-            max_x = min_x + factor_x
+    for i in range(0,output_height):
+        min_y = i * pooling_size[1]
+        max_y = min_y + pooling_size[1]
+        for j in range(0,output_width):
+            min_x = j * pooling_size[0]
+            max_x = min_x + pooling_size[0]
             selection = image[min_x:max_x, min_y:max_y]
             output[j,i] = np.max(selection)
     
@@ -78,7 +77,6 @@ def max_pool_image(image, pooled_size, normalised = False):
         return normalise_image(output)
 
     return output
-
 
 def uniform_kernel(width, height):
     n = width * height
@@ -95,7 +93,7 @@ def vertical_edge_kernel(width, height):
             kernel[i,j] = value
     return kernel
 
-def horizontal_edge_kernel(width,height):
+def horizontal_edge_kernel(width, height):
     kernel = np.zeros((width, height))
     mid = int(height/2)
     for i in range(height):
@@ -104,6 +102,9 @@ def horizontal_edge_kernel(width,height):
             value = value / width
             kernel[i,j] = value
     return kernel
+
+def random_kernel(width, height):
+    return np.random.uniform(-1,1,(width,height))
 
 def average_image(images):
     output = np.zeros(images[0].shape)
@@ -136,6 +137,7 @@ def test():
 
     k = horizontal_edge_kernel(3,3)
     hori_edges = convolve_image(sharpened, k)
+    show_image(hori_edges)
 
-    pooled = max_pool_image(vert_edges, (14,14))
+    pooled = max_pool_image(vert_edges, (2,2))
     show_image(pooled)
