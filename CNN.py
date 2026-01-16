@@ -25,21 +25,29 @@ class c_layer:
         outputs = []
         for kernel, bias in zip(self.kernels, self.biases):
             if self.channels > 1:
-                convolved = [c.convolve_image(i,k) for i,k in zip(x,kernel)]
-                activated = self.activation(np.add(convolved, bias))
-                pooled = [c.max_pool_image(a, self.pool_size) for a in activated]
+                convolved = c.convolve_image_channels(x,kernel,self.channels)
             else:
                 convolved = c.convolve_image(x, kernel)
-                activated = self.activation(np.add(convolved, bias))
-                pooled = c.max_pool_image(activated, self.pool_size)
+            activated = self.activation(np.add(convolved, bias))
+            pooled = c.max_pool_image(activated, self.pool_size)
             outputs.append(pooled)
         
         return np.array(outputs)
         
+def normalise(data, factor=255.0):
+    size = 1
+    for s in data.shape:
+        size = size * s
+    
+    output = np.reshape(data,(size))
+    output = np.divide(output, factor)
+
+    return output
 
 def test():
-    layer1 = c_layer((2,5,5), (1,1), activation=n.relu)
-    layer2 = c_layer((4,3,3), channels=2, activation=n.sigmoid)
+    layer1 = c_layer((2,5,5), (2,2), activation=n.relu)
+    layer2 = c_layer((4,3,3), (2,2), channels=2, activation=n.sigmoid)
+    fc_layer = n.N_Network([], 7*7*4, 10, activation_functions=[n.softmax])
 
     import mnist_data as mnist
 
@@ -47,14 +55,17 @@ def test():
 
     out = layer1.feedforward(X[0])
     out = layer2.feedforward(out)
-    #print(out.shape)
+    norm = normalise(out)
+    predicted = fc_layer.predict(norm)
 
-    for image in out:
-        if (len(image.shape) > 2):
-            for channel in image:
-                c.show_image(channel)
-        else:
-            c.show_image(image)
+    print(predicted)
+
+    #for image in out:
+    #    if (len(image.shape) > 2):
+    #        for channel in image:
+    #            c.show_image(channel)
+    #    else:
+    #        c.show_image(image)
 
 
 test()

@@ -56,6 +56,13 @@ def convolve_image(image, kernel, normalised=False):
 
     return output
 
+def convolve_image_channels(image, kernel, channels, normalised=False):
+    output = np.zeros(image.shape[1:])
+    for channel in range(channels):
+        convolved = convolve_image(image[channel], kernel[channel])
+        output = np.add(output, convolved)
+    return output
+
 def pool_image(image, pooling_size, pool_func, stride = None, normalised = False):
     if(normalised):
         image = denormalise_image(image)
