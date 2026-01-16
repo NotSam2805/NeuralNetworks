@@ -78,10 +78,11 @@ def test():
     import mnist_data as mnist
 
     X = mnist.test_X
-
-    predict = net.predict(X[0])
+    image = X[0]
+    predict = net.predict(image)
 
     print(predict)
+    c.show_image(image)
 
     #for image in out:
     #    if (len(image.shape) > 2):
