@@ -56,7 +56,7 @@ def convolve_image(image, kernel, normalised=False):
 
     return output
 
-def max_pool_image(image, pooling_size, stride = None, normalised = False):
+def pool_image(image, pooling_size, pool_func, stride = None, normalised = False):
     if(normalised):
         image = denormalise_image(image)
     
@@ -74,12 +74,21 @@ def max_pool_image(image, pooling_size, stride = None, normalised = False):
             min_x = j * stride
             max_x = min_x + stride
             selection = image[min_x:max_x, min_y:max_y]
-            output[j,i] = np.max(selection)
+            output[j,i] = pool_func(selection)
     
     if (normalised):
         return normalise_image(output)
 
     return output
+
+def max_pool_image(image, pooling_size, stride = None, normalised = False):
+    return pool_image(image, pooling_size, np.max, stride, normalised)
+
+def min_pool_image(image, pooling_size, stride = None, normalised = False):
+    return pool_image(image, pooling_size, np.min, stride, normalised)
+
+def average_pool_image(image, pooling_size, stride = None, normalised = False):
+    return pool_image(image, pooling_size, np.average, stride, normalised)
 
 def uniform_kernel(width, height):
     n = width * height
@@ -143,4 +152,10 @@ def test():
     show_image(hori_edges)
 
     pooled = max_pool_image(vert_edges, (2,2))
+    show_image(pooled)
+
+    pooled = min_pool_image(hori_edges, (2,2))
+    show_image(pooled)
+
+    pooled = average_pool_image(sharpened, (2,2))
     show_image(pooled)
