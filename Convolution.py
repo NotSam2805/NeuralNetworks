@@ -56,20 +56,23 @@ def convolve_image(image, kernel, normalised=False):
 
     return output
 
-def max_pool_image(image, pooling_size, normalised = False):
+def max_pool_image(image, pooling_size, stride = None, normalised = False):
     if(normalised):
         image = denormalise_image(image)
     
+    if (stride == None):
+        stride = pooling_size[0]
+
     output_width = int(image.shape[0] / pooling_size[0])
     output_height = int(image.shape[1] / pooling_size[1])
     output = np.zeros((output_width, output_height))
 
     for i in range(0,output_height):
-        min_y = i * pooling_size[1]
-        max_y = min_y + pooling_size[1]
+        min_y = i * stride
+        max_y = min_y + stride
         for j in range(0,output_width):
-            min_x = j * pooling_size[0]
-            max_x = min_x + pooling_size[0]
+            min_x = j * stride
+            max_x = min_x + stride
             selection = image[min_x:max_x, min_y:max_y]
             output[j,i] = np.max(selection)
     
