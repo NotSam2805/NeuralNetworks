@@ -2,6 +2,9 @@ import random as rnd
 import numpy as np
 import json
 import sys
+import warnings
+
+warnings.filterwarnings('ignore')
 
 def sigmoid(x):
   return np.divide(1,np.add(np.exp(-x),1))
