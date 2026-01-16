@@ -33,7 +33,31 @@ class c_layer:
             outputs.append(pooled)
         
         return np.array(outputs)
+
+class CNN:
+    def __init__(self, c_layers, fc_network):
+        self.c_layers = c_layers
+        self.fc_network = fc_network
+
+    def feedforward(self, x):
+        out = x
+        for layer in self.c_layers:
+            out = layer.feedforward(out)
         
+        norm = normalise(out,1)
+
+        fc_out = self.fc_network.feedforward(norm)
+
+        return fc_out
+    
+    def predict(self, input):
+        output = self.feedforward(input)
+        values = []
+        for value in output:
+            values.append(value[0])
+        confidence = max(values)
+        return (values.index(confidence), confidence)
+
 def normalise(data, factor=255.0):
     size = 1
     for s in data.shape:
@@ -49,16 +73,15 @@ def test():
     layer2 = c_layer((4,3,3), (2,2), channels=2, activation=n.sigmoid)
     fc_layer = n.N_Network([], 7*7*4, 10, activation_functions=[n.softmax])
 
+    net = CNN([layer1,layer2],fc_layer)
+
     import mnist_data as mnist
 
     X = mnist.test_X
 
-    out = layer1.feedforward(X[0])
-    out = layer2.feedforward(out)
-    norm = normalise(out)
-    predicted = fc_layer.predict(norm)
+    predict = net.predict(X[0])
 
-    print(predicted)
+    print(predict)
 
     #for image in out:
     #    if (len(image.shape) > 2):

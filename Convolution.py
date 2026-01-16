@@ -59,7 +59,7 @@ def convolve_image(image, kernel, normalised=False):
 def convolve_image_channels(image, kernel, channels, normalised=False):
     output = np.zeros(image.shape[1:])
     for channel in range(channels):
-        convolved = convolve_image(image[channel], kernel[channel])
+        convolved = convolve_image(image[channel], kernel[channel], normalised=normalised)
         output = np.add(output, convolved)
     return output
 
