@@ -29,17 +29,22 @@ def show_image(image, normalised=False):
     pyplot.autoscale()
     pyplot.show()
 
-def convolve_image(image, kernel, normalised=False):
+def convolve_image(image, kernel, stride = None, normalised=False):
     if(normalised):
         image = denormalise_image(image)
+    
+    if (stride == None):
+        stride = 1
+
     image_height, image_width = image.shape
     kernel_height, kernel_width = kernel.shape
-    output = np.zeros(image.shape)
+    output_height, output_width = int(image_height/stride), int(image_width/stride)
+    output = np.zeros((output_height, output_width))
 
-    for i in range(image_height):
+    for i in range(0, image_height, stride):
         min_height = max(0,i - int(kernel_height/2))
         max_height = min(image_height -  1, i + int(kernel_height/2) + 1)
-        for j in range(image_width):
+        for j in range(0, image_width, stride):
             min_width = max(0,j - int(kernel_width/2))
             max_width = min(image_width - 1,j + int(kernel_width/2) + 1)
             #print(f'Height: {min_height} - {max_height}, width: {min_width} - {max_width}')
@@ -47,9 +52,9 @@ def convolve_image(image, kernel, normalised=False):
             #print(selection.shape)
             if selection.shape != kernel.shape:
                 k = kernel[0:selection.shape[0], 0:selection.shape[1]]
-                output[j,i] = np.sum(np.multiply(selection, k))
+                output[int(j/stride),int(i/stride)] = np.sum(np.multiply(selection, k))
             else:
-                output[j,i] = np.sum(np.multiply(selection, kernel))
+                output[int(j/stride),int(i/stride)] = np.sum(np.multiply(selection, kernel))
     
     if (normalised):
         return normalise_image(output)
@@ -70,16 +75,16 @@ def pool_image(image, pooling_size, pool_func, stride = None, normalised = False
     if (stride == None):
         stride = pooling_size[0]
 
-    output_width = int(image.shape[0] / pooling_size[0])
-    output_height = int(image.shape[1] / pooling_size[1])
+    output_width = int(image.shape[0] / stride)
+    output_height = int(image.shape[1] / stride)
     output = np.zeros((output_width, output_height))
 
     for i in range(0,output_height):
         min_y = i * stride
-        max_y = min_y + stride
+        max_y = min_y + pooling_size[0]
         for j in range(0,output_width):
             min_x = j * stride
-            max_x = min_x + stride
+            max_x = min_x + pooling_size[1]
             selection = image[min_x:max_x, min_y:max_y]
             output[j,i] = pool_func(selection)
     
@@ -147,24 +152,27 @@ def test():
 
     X, y = mnist.test_data()
     image = X[0]
-    show_image(image)
+    #show_image(image)
 
     sharpened = convolve_image(image,sharpen_kernel)
-    show_image(sharpened)
+    #show_image(sharpened)
 
     k = vertical_edge_kernel(3,3)
     vert_edges = convolve_image(sharpened, k)
-    show_image(vert_edges)
+    #show_image(vert_edges)
 
     k = horizontal_edge_kernel(3,3)
     hori_edges = convolve_image(sharpened, k)
-    show_image(hori_edges)
+    #show_image(hori_edges)
 
-    pooled = max_pool_image(vert_edges, (2,2))
+    pooled = max_pool_image(hori_edges, (2,2))
     show_image(pooled)
 
-    pooled = min_pool_image(hori_edges, (2,2))
-    show_image(pooled)
+    stepped = convolve_image(sharpened, k, stride= 2)
+    show_image(stepped)
+
+    pooled = min_pool_image(vert_edges, (2,2))
+    #show_image(pooled)
 
     pooled = average_pool_image(sharpened, (2,2))
-    show_image(pooled)
+    #show_image(pooled)
