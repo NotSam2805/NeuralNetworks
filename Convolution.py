@@ -68,6 +68,26 @@ def convolve_valid(image: np.ndarray, kernel: np.ndarray, stride: int = 1) -> np
 
     return out
 
+def convolve_valid_channels(image: np.ndarray, kernel: np.ndarray, stride: int = 1) -> np.ndarray:
+    """
+    image:  (C, H, W)
+    kernel: (C, K, K)
+    returns: (H_out, W_out)
+    """
+    image = np.asarray(image)
+    kernel = np.asarray(kernel)
+
+    if image.ndim != 3 or kernel.ndim != 3:
+        raise ValueError("expects image (C,H,W) and kernel (C,K,K)")
+    if image.shape[0] != kernel.shape[0]:
+        raise ValueError("image and kernel must have same channel count")
+
+    out = None
+    for c in range(image.shape[0]):
+        conv_c = convolve_valid(image[c], kernel[c], stride=stride)
+        out = conv_c if out is None else (out + conv_c)
+    return out
+
 def convolve_image(image, kernel, stride = 1, normalised=False):
     if(normalised):
         image = denormalise_image(image)

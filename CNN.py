@@ -25,9 +25,9 @@ class c_layer:
         outputs = []
         for kernel, bias in zip(self.kernels, self.biases):
             if self.channels > 1:
-                convolved = c.convolve_image_channels(x,kernel,self.channels)
+                convolved = c.convolve_valid_channels(x,kernel,self.channels)
             else:
-                convolved = c.convolve_image(x, kernel)
+                convolved = c.convolve_valid(x, kernel)
             activated = self.activation(np.add(convolved, bias))
             pooled = c.max_pool_image(activated, self.pool_size)
             outputs.append(pooled)
