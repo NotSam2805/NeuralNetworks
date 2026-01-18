@@ -104,7 +104,6 @@ class N_Network:
         for i in range(2, len(np_activations)):
             z = zs[-i]
             sp = self.activation_derivatives[1-i](z)
-            layer_count += 1
             delta = np.dot(self.weights[-i+1].transpose(), delta) * sp
 
             nabla_b[-i] = delta

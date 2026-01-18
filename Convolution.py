@@ -29,17 +29,56 @@ def show_image(image, normalised=False):
     pyplot.autoscale()
     pyplot.show()
 
-def convolve_image(image, kernel, stride = None, normalised=False):
+def convolve_valid(image: np.ndarray, kernel: np.ndarray, stride: int = 1) -> np.ndarray:
+    """
+    Valid 2D cross-correlation (commonly called convolution in CNNs).
+    image:  (H, W)
+    kernel: (K, K)
+    stride: int >= 1
+    returns: (H_out, W_out) where
+        H_out = (H - K)//stride + 1
+        W_out = (W - K)//stride + 1
+    """
+    image = np.asarray(image)
+    kernel = np.asarray(kernel)
+
+    if image.ndim != 2 or kernel.ndim != 2:
+        raise ValueError("convolve_valid expects 2D arrays: image (H,W), kernel (K,K)")
+    if stride < 1:
+        raise ValueError("stride must be >= 1")
+
+    H, W = image.shape
+    K1, K2 = kernel.shape
+    if K1 != K2:
+        raise ValueError("kernel must be square (K,K)")
+    K = K1
+
+    H_out = (H - K) // stride + 1
+    W_out = (W - K) // stride + 1
+    if H_out <= 0 or W_out <= 0:
+        raise ValueError("kernel is larger than image for valid convolution")
+
+    out = np.zeros((H_out, W_out), dtype=float)
+
+    # Cross-correlation (no kernel flip) — standard in CNNs
+    for i_out, i in enumerate(range(0, H - K + 1, stride)):
+        for j_out, j in enumerate(range(0, W - K + 1, stride)):
+            patch = image[i:i+K, j:j+K]
+            out[i_out, j_out] = np.sum(patch * kernel)
+
+    return out
+
+def convolve_image(image, kernel, stride = 1, normalised=False):
     if(normalised):
         image = denormalise_image(image)
-    
-    if (stride == None):
-        stride = 1
 
     image_height, image_width = image.shape
     kernel_height, kernel_width = kernel.shape
-    output_height, output_width = int(image_height/stride), int(image_width/stride)
+    output_height = image_height//stride + 1
+    output_width = image_width//stride + 1
+
     output = np.zeros((output_height, output_width))
+    #print(output.shape)
 
     for i in range(0, image_height, stride):
         min_height = max(0,i - int(kernel_height/2))
@@ -48,13 +87,13 @@ def convolve_image(image, kernel, stride = None, normalised=False):
             min_width = max(0,j - int(kernel_width/2))
             max_width = min(image_width - 1,j + int(kernel_width/2) + 1)
             #print(f'Height: {min_height} - {max_height}, width: {min_width} - {max_width}')
-            selection = image[min_width:max_width,min_height:max_height]
+            selection = image[min_height:max_height, min_width:max_width]
             #print(selection.shape)
             if selection.shape != kernel.shape:
                 k = kernel[0:selection.shape[0], 0:selection.shape[1]]
-                output[int(j/stride),int(i/stride)] = np.sum(np.multiply(selection, k))
+                output[int(i/stride), int(j/stride)] = np.sum(np.multiply(selection, k))
             else:
-                output[int(j/stride),int(i/stride)] = np.sum(np.multiply(selection, kernel))
+                output[int(i/stride), int(j/stride)] = np.sum(np.multiply(selection, kernel))
     
     if (normalised):
         return normalise_image(output)
@@ -85,8 +124,8 @@ def pool_image(image, pooling_size, pool_func, stride = None, normalised = False
         for j in range(0,output_width):
             min_x = j * stride
             max_x = min_x + pooling_size[1]
-            selection = image[min_x:max_x, min_y:max_y]
-            output[j,i] = pool_func(selection)
+            selection = image[min_y:max_y, min_x:max_x]
+            output[i,j] = pool_func(selection)
     
     if (normalised):
         return normalise_image(output)
@@ -152,27 +191,10 @@ def test():
 
     X, y = mnist.test_data()
     image = X[0]
-    #show_image(image)
-
-    sharpened = convolve_image(image,sharpen_kernel)
-    #show_image(sharpened)
+    show_image(image)
 
     k = vertical_edge_kernel(3,3)
-    vert_edges = convolve_image(sharpened, k)
-    #show_image(vert_edges)
+    vert_edge = convolve_valid(image, k)
+    show_image(vert_edge)
 
-    k = horizontal_edge_kernel(3,3)
-    hori_edges = convolve_image(sharpened, k)
-    #show_image(hori_edges)
-
-    pooled = max_pool_image(hori_edges, (2,2))
-    show_image(pooled)
-
-    stepped = convolve_image(sharpened, k, stride= 2)
-    show_image(stepped)
-
-    pooled = min_pool_image(vert_edges, (2,2))
-    #show_image(pooled)
-
-    pooled = average_pool_image(sharpened, (2,2))
-    #show_image(pooled)
+test()

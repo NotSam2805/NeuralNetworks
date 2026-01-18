@@ -4,14 +4,14 @@ import networks as n
 
 class c_layer:
 
-    def __init__(self, layer_size, pool_size = (1,1), channels = 1, activation = n.relu, kernels = []):
+    def __init__(self, layer_size, pool_size = (1,1), channels = 1, activation = n.relu, kernels = None):
         self.size = layer_size
         self.activation = activation
         self.pool_size = pool_size
         self.channels = channels
         self.biases = np.random.uniform(-1,1,(layer_size[0]))
 
-        if(kernels == []):
+        if(kernels == None):
             if channels > 1:
                 self.kernels = [c.random_kernel((channels,layer_size[1],layer_size[2])) for i in range(layer_size[0])]
             else:
@@ -59,11 +59,9 @@ class CNN:
         return (values.index(confidence), confidence)
 
 def normalise(data, factor=255.0):
-    size = 1
-    for s in data.shape:
-        size = size * s
+    size = data.size
     
-    output = np.reshape(data,(size))
+    output = np.reshape(data,(size,1))
     output = np.divide(output, factor)
 
     return output
