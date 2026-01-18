@@ -1,7 +1,7 @@
 import networks as n
 
 dataset_size = 60000 #MAX=60000
-file = 'ReLu_Softmax_3.json'
+file = 'ReLu_Softmax_4.json'
 epochs = 10
 batch_size = 256
 learn_rate = 0.001
@@ -9,7 +9,7 @@ eval = True
 test_size = 1000 #MAX=10000
 
 print('Initialising network...',end='\r')
-network = n.N_Network([128,128,64], 28 * 28, 10, [n.relu, n.relu, n.relu, n.softmax], [n.relu_prime, n.relu_prime, n.relu_prime])
+network = n.N_Network([256,256,128,64], 28 * 28, 10, [n.relu, n.relu, n.relu, n.relu, n.softmax], [n.relu_prime, n.relu_prime, n.relu_prime, n.relu_prime])
 print('Network initialised          ')
 
 import mnist_data as mnist
