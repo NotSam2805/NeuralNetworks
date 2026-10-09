@@ -1,11 +1,11 @@
 import networks as n
 
 dataset_size = 60000 #MAX=60000
-file = '4_Descending_ReLu_Softmax.json'
+file = input("Model File:")
 epochs = 1
 batch_size = 256
 learn_rate = 0.001
-eval = True
+eval = False
 test_size = 1000 #MAX=10000
 
 print('Initialising network...',end='\r')
