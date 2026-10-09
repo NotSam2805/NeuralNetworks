@@ -115,7 +115,7 @@ def average_true_confidence(network, X,y):
             count += 1
     return sum/count
 
-file = input("Model File:")
+file = input("Model File: ")
 dataset_size = 10000 #MAX=10000
 print('Initialising network...', end='\r')
 network = n.N_Network(

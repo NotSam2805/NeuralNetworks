@@ -1,12 +1,12 @@
 import networks as n
 
 dataset_size = 60000 #MAX=60000
-file = input("Model File:")
-epochs = 1
-batch_size = 256
+file = input("Model File: ")
+epochs = int(input("Epochs: "))
+batch_size = int(input("Batch size: "))
 learn_rate = 0.001
-eval = False
-test_size = 1000 #MAX=10000
+eval = bool(input("Test each epoch: "))
+test_size = int(input("Test size (max=10000): ")) #MAX=10000
 
 print('Initialising network...',end='\r')
 network = n.N_Network(
