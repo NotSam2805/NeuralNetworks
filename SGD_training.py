@@ -6,7 +6,9 @@ epochs = int(input("Epochs: "))
 batch_size = int(input("Batch size: "))
 learn_rate = 0.001
 eval = bool(input("Test each epoch: "))
-test_size = int(input("Test size (max=10000): ")) #MAX=10000
+test_size = 0
+if (eval):
+    test_size = int(input("Test size (max=10000): ")) #MAX=10000
 
 print('Initialising network...',end='\r')
 network = n.N_Network(
