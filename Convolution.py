@@ -217,4 +217,5 @@ def test():
     vert_edge = convolve_valid(image, k)
     show_image(vert_edge)
 
-test()
+if __name__ == "__main__":
+    test()

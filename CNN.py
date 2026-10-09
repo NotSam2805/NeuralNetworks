@@ -43,8 +43,8 @@ class CNN:
         out = x
         for layer in self.c_layers:
             out = layer.feedforward(out)
-        
-        norm = normalise(out,1)
+
+        norm = normalise(out)
 
         fc_out = self.fc_network.feedforward(norm)
 
@@ -69,7 +69,7 @@ def normalise(data, factor=255.0):
 def test():
     layer1 = c_layer((2,5,5), (2,2), activation=n.relu)
     layer2 = c_layer((4,3,3), (2,2), channels=2, activation=n.sigmoid)
-    fc_layer = n.N_Network([], 7*7*4, 10, activation_functions=[n.softmax])
+    fc_layer = n.N_Network([16, 16], 16, 10)
 
     net = CNN([layer1,layer2],fc_layer)
 
@@ -89,5 +89,5 @@ def test():
     #    else:
     #        c.show_image(image)
 
-
-test()
+if __name__ == "__main__":
+    test()

@@ -115,10 +115,14 @@ def average_true_confidence(network, X,y):
             count += 1
     return sum/count
 
-file = 'ReLu_Softmax_3.json'
+file = 'Large_Relu_Softmax.json'
 dataset_size = 10000 #MAX=10000
 print('Initialising network...', end='\r')
-network = n.N_Network([128,64], 28 * 28, 10, [n.relu, n.relu, n.softmax], [n.relu_prime, n.relu_prime])
+network = n.N_Network(
+    [128,64,32,16], 28 * 28, 10,
+    [n.relu, n.relu, n.relu, n.relu, n.softmax],
+    [n.relu_prime, n.relu_prime, n.relu_prime, n.relu_prime]
+)
 print('Network initialised              ')
 
 (test_data, test_labels) = mnist.normalised_test_data()

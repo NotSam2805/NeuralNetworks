@@ -1,16 +1,26 @@
 import networks as n
 
 dataset_size = 60000 #MAX=60000
-file = 'ReLu_Softmax_4.json'
-epochs = 10
+file = '4_Descending_ReLu_Softmax.json'
+epochs = 1
 batch_size = 256
 learn_rate = 0.001
 eval = True
 test_size = 1000 #MAX=10000
 
 print('Initialising network...',end='\r')
-network = n.N_Network([256,256,128,64], 28 * 28, 10, [n.relu, n.relu, n.relu, n.relu, n.softmax], [n.relu_prime, n.relu_prime, n.relu_prime, n.relu_prime])
+network = n.N_Network(
+    [256,128,64,32], 28 * 28, 10,
+    [n.relu, n.relu, n.relu, n.relu, n.softmax],
+    [n.relu_prime, n.relu_prime, n.relu_prime, n.relu_prime]
+)
 print('Network initialised          ')
+
+import os.path
+if os.path.exists(file):
+    print(f'Loading network from {file}...',end='\r')
+    network.load_json(file)
+    print(f'Network loaded from {file}                   \n')
 
 import mnist_data as mnist
 
@@ -24,12 +34,6 @@ print(f'Using dataset size: {dataset_size}')
 
 train_outputs = mnist.expected_outputs(dataset_y)
 print('Dataset formatting complete\n')
-
-import os.path
-if os.path.exists(file):
-    print(f'Loading network from {file}...',end='\r')
-    network.load_json(file)
-    print(f'Network loaded from {file}                   \n')
 
 print('Running SGD training')
 dataset = mnist.convert_to_list_of_tuples(dataset_X, train_outputs)
