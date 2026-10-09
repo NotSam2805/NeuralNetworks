@@ -5,7 +5,9 @@ file = input("Model File: ")
 epochs = int(input("Epochs: "))
 batch_size = int(input("Batch size: "))
 learn_rate = 0.001
-eval = bool(input("Test each epoch: "))
+eval = False
+if (input("Test each epoch (Y/N): ") == "Y"):
+    eval = True
 test_size = 0
 if (eval):
     test_size = int(input("Test size (max=10000): ")) #MAX=10000
